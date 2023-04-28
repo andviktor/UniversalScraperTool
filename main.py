@@ -2,7 +2,8 @@ import functions.f_requests as f_requests
 import functions.f_bs4 as f_bs
 import functions.f_csv as f_csv
 import functions.f_txt as f_txt
-import re
+import re, time
+from multiprocessing.pool import ThreadPool
 
 def scrape_requests(attrs, report=False):
     """Get request and return html objects
@@ -70,29 +71,64 @@ def scrape_requests(attrs, report=False):
 
 def main():
 
-    # Input/Output filenames
-    output_links = './output/links.csv'
+    ### Start time
+    start_time = time.time()
+
+    ### concurrency
+    concurrency = 20
+
+    ### Input/Output filenames
+    input_tasks = './input/tasks.txt'
+    output_links = './output/links.txt'
     output = './output/output.csv'
 
-    # Headers
+    ### Headers
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
 
-    # Scraping: get all links
+    ### Scraping: get categories links
     attrs = {
-        'url': 'http://ns-maf.ru/catalog/kacheli',
+        'url': 'http://ns-maf.ru/',
         'headers': {
             'User-Agent': user_agent
             },
         'elements': [
             {
                 'name': 'links',
-                'xpath': '//div[contains(@class,"block-4 text-center border h-100")]/a'
+                'xpath': '//ul[contains(@class,"site-menu")][1]//ul[@class="dropdown"]//a/@href'
             }
         ]
     }
-    links = scrape_requests(attrs)['links']
+    categories = scrape_requests(attrs)['links']
+    for category in categories:
+
+        ### Scraping: get all links
+        attrs = {
+            'url': category,
+            'headers': {
+                'User-Agent': user_agent
+                },
+            'elements': [
+                {
+                    'name': 'links',
+                    'xpath': '//div[contains(@class,"block-4 text-center border h-100")]/a/@href'
+                }
+            ]
+        }
+        links = scrape_requests(attrs)['links']
+        f_txt.write_txt(input_tasks, links, mode='a')
+
+    ### Scraping (Pool task): get every link page data
+    def scrape_link(link):
+        if not link in links_done:
+            try:
+                attrs['url'] = link
+                elements = scrape_requests(attrs, report=False)
+                f_csv.write_dict_row_csv(output, csv_header, elements)
+                f_txt.write_txt(output_links, link, mode='a')
+            except:
+                print('Error: ' + link)
     
-    # Scraping: get every link page data
+    links = f_txt.read_file_txt(input_tasks)
     attrs = {
         'headers': {
             'User-Agent': user_agent
@@ -132,15 +168,12 @@ def main():
         'images'
     ]
     links_done = f_txt.read_file_txt(output_links)
-    for link in links:
-        if not link.attrib['href'] in links_done:
-            try:
-                attrs['url'] = link.attrib['href']
-                elements = scrape_requests(attrs, report=False)
-                f_csv.write_dict_row_csv(output, csv_header, elements)
-                f_txt.write_row_txt(output_links, link.attrib['href'], mode='a')
-            except:
-                print('Error: ' + link.attrib['href'])
+    pool = ThreadPool(concurrency) 
+    pool.map(scrape_link, links) 
+    pool.close() 
+    pool.join()
+
+    print('Completed, total time is: '+str(time.time() - start_time))
 
 if __name__ == '__main__':
     main()

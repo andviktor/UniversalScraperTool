@@ -1,5 +1,7 @@
 # Custom
 output/
+input/
+What to do.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
