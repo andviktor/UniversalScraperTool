@@ -46,6 +46,8 @@ def scrape_requests(attrs, report=False):
             result[0][0].attrib['href'] - first result for the first xpath, get attribute 'href'
     """
     response = f_requests.get(attrs['url'], headers=attrs['headers'])
+    if response.status_code == 404:
+        return 404
     soup = f_bs.set_soup(response)
     output = {}
     for xpath in attrs['elements']:
@@ -73,6 +75,8 @@ def main():
 
     ### Start time
     start_time = time.time()
+    errors = 0
+    pagenotfound = 0
 
     ### concurrency
     concurrency = 20
@@ -86,47 +90,52 @@ def main():
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
 
     ### Scraping: get categories links
-    attrs = {
-        'url': 'http://ns-maf.ru/',
-        'headers': {
-            'User-Agent': user_agent
-            },
-        'elements': [
-            {
-                'name': 'links',
-                'xpath': '//ul[contains(@class,"site-menu")][1]//ul[@class="dropdown"]//a/@href'
-            }
-        ]
-    }
-    categories = scrape_requests(attrs)['links']
-    for category in categories:
+    # attrs = {
+    #     'url': 'http://ns-maf.ru/',
+    #     'headers': {
+    #         'User-Agent': user_agent
+    #         },
+    #     'elements': [
+    #         {
+    #             'name': 'links',
+    #             'xpath': '//ul[contains(@class,"site-menu")][1]//ul[@class="dropdown"]//a/@href'
+    #         }
+    #     ]
+    # }
+    # categories = scrape_requests(attrs)['links']
+    # for category in categories:
 
-        ### Scraping: get all links
-        attrs = {
-            'url': category,
-            'headers': {
-                'User-Agent': user_agent
-                },
-            'elements': [
-                {
-                    'name': 'links',
-                    'xpath': '//div[contains(@class,"block-4 text-center border h-100")]/a/@href'
-                }
-            ]
-        }
-        links = scrape_requests(attrs)['links']
-        f_txt.write_txt(input_tasks, links, mode='a')
+    #     ### Scraping: get all links
+    #     attrs = {
+    #         'url': category,
+    #         'headers': {
+    #             'User-Agent': user_agent
+    #             },
+    #         'elements': [
+    #             {
+    #                 'name': 'links',
+    #                 'xpath': '//div[contains(@class,"block-4 text-center border h-100")]/a/@href'
+    #             }
+    #         ]
+    #     }
+    #     links = scrape_requests(attrs)['links']
+    #     f_txt.write_txt(input_tasks, links, mode='a')
 
     ### Scraping (Pool task): get every link page data
     def scrape_link(link):
+        nonlocal errors, pagenotfound
         if not link in links_done:
             try:
                 attrs['url'] = link
                 elements = scrape_requests(attrs, report=False)
-                f_csv.write_dict_row_csv(output, csv_header, elements)
-                f_txt.write_txt(output_links, link, mode='a')
+                if elements != 404:
+                    f_csv.write_dict_row_csv(output, csv_header, elements)
+                    f_txt.write_txt(output_links, link, mode='a')
+                else:
+                    pagenotfound += 1
             except:
                 print('Error: ' + link)
+                errors += 1
     
     links = f_txt.read_file_txt(input_tasks)
     attrs = {
@@ -169,11 +178,13 @@ def main():
     ]
     links_done = f_txt.read_file_txt(output_links)
     pool = ThreadPool(concurrency) 
-    pool.map(scrape_link, links) 
+    pool.map(scrape_link, links)
     pool.close() 
     pool.join()
 
     print('Completed, total time is: '+str(time.time() - start_time))
+    print('Errors: '+str(errors))
+    print('404: '+str(pagenotfound))
 
 if __name__ == '__main__':
     main()
