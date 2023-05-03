@@ -3,8 +3,8 @@ import functions.f_bs4 as f_bs
 import functions.f_csv as f_csv
 import functions.f_txt as f_txt
 import functions.f_str as f_str
+import functions.f_thread as f_thread
 import re, time
-from multiprocessing.pool import ThreadPool
 
 def scrape_requests(attrs, report=False):
     """Get request and return html objects
@@ -104,11 +104,11 @@ def main():
         ]
     }
     categories = scrape_requests(attrs)['links']
-    for category in categories:
 
-        ### Scraping: get all links
+    ### Scraping: get all links
+    def scrape_category(link):
         attrs = {
-            'url': category,
+            'url': link,
             'headers': {
                 'User-Agent': user_agent
                 },
@@ -121,6 +121,7 @@ def main():
         }
         links = scrape_requests(attrs)['links']
         f_txt.write_txt(input_tasks, links, mode='a')
+    f_thread.create_pool(scrape_category, categories, concurrency)
 
     ### Scraping (Pool task): get every link page data
     def scrape_link(link):
@@ -178,10 +179,7 @@ def main():
         'images'
     ]
     links_done = f_txt.read_file_txt(output_links)
-    pool = ThreadPool(concurrency) 
-    pool.map(scrape_link, links)
-    pool.close() 
-    pool.join()
+    f_thread.create_pool(scrape_link, links, concurrency)
 
     print('Completed, total time is: '+str(time.time() - start_time))
     print('Errors: '+str(errors))
