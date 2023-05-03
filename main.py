@@ -2,6 +2,7 @@ import functions.f_requests as f_requests
 import functions.f_bs4 as f_bs
 import functions.f_csv as f_csv
 import functions.f_txt as f_txt
+import functions.f_str as f_str
 import re, time
 from multiprocessing.pool import ThreadPool
 
@@ -72,7 +73,7 @@ def scrape_requests(attrs, report=False):
     return output
 
 def main():
-
+    
     ### Start time
     start_time = time.time()
     errors = 0
@@ -90,36 +91,36 @@ def main():
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
 
     ### Scraping: get categories links
-    # attrs = {
-    #     'url': 'http://ns-maf.ru/',
-    #     'headers': {
-    #         'User-Agent': user_agent
-    #         },
-    #     'elements': [
-    #         {
-    #             'name': 'links',
-    #             'xpath': '//ul[contains(@class,"site-menu")][1]//ul[@class="dropdown"]//a/@href'
-    #         }
-    #     ]
-    # }
-    # categories = scrape_requests(attrs)['links']
-    # for category in categories:
+    attrs = {
+        'url': 'http://ns-maf.ru/',
+        'headers': {
+            'User-Agent': user_agent
+            },
+        'elements': [
+            {
+                'name': 'links',
+                'xpath': '//ul[contains(@class,"site-menu")][1]//ul[@class="dropdown"]//a/@href'
+            }
+        ]
+    }
+    categories = scrape_requests(attrs)['links']
+    for category in categories:
 
-    #     ### Scraping: get all links
-    #     attrs = {
-    #         'url': category,
-    #         'headers': {
-    #             'User-Agent': user_agent
-    #             },
-    #         'elements': [
-    #             {
-    #                 'name': 'links',
-    #                 'xpath': '//div[contains(@class,"block-4 text-center border h-100")]/a/@href'
-    #             }
-    #         ]
-    #     }
-    #     links = scrape_requests(attrs)['links']
-    #     f_txt.write_txt(input_tasks, links, mode='a')
+        ### Scraping: get all links
+        attrs = {
+            'url': category,
+            'headers': {
+                'User-Agent': user_agent
+                },
+            'elements': [
+                {
+                    'name': 'links',
+                    'xpath': '//div[contains(@class,"block-4 text-center border h-100")]/a/@href'
+                }
+            ]
+        }
+        links = scrape_requests(attrs)['links']
+        f_txt.write_txt(input_tasks, links, mode='a')
 
     ### Scraping (Pool task): get every link page data
     def scrape_link(link):
