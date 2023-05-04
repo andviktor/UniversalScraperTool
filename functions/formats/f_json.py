@@ -9,9 +9,13 @@ def print_json(json_object):
                 response = f_requests.get(url, headers).json()
                 print(response)
 
+        Return:
+        formatted JSON
+
     """
     json_formatted_str = json.dumps(json_object, indent=2)
     print(json_formatted_str)
+    return json_formatted_str
 
 def read_json(filename):
     """Reads JSON file to dictionary
