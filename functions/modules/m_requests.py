@@ -1,7 +1,7 @@
 import requests
 import re
 
-def get(url, headers):
+def get(url, headers, cookies=''):
     """Get request to the url and return response with print log message
 
         Params:
@@ -13,13 +13,15 @@ def get(url, headers):
             'headers': {
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36'
                 }
+        
+        cookies (dict) - cookies dictionary
 
         Return:
             response of the request or False
 
     """
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, cookies=cookies)
         print('{}: {}'.format(response.status_code, url))
         return response
     except:
@@ -46,3 +48,25 @@ def download_file(url, dir, filename=''):
     except:
         print('Error download file: ' + url)
         return False
+    
+def auth_post(url, data):
+    """Posts request to an auth form and returns cookies
+
+        Params:
+        url (str) - auth form url,
+        data (dict) - data dictionary for a post request
+
+        Return:
+        returns cookies dictionary.
+
+        Example:
+        url = 'https://www.pakwheels.com/login-with-email'
+        data = {
+            'username': 'myuser',
+            'password': '123pass'
+        }
+        cookies = m_requests.auth_post(url, data)
+
+    """
+    response = requests.post(url, data=data)
+    return response.cookies

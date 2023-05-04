@@ -42,7 +42,11 @@ def scrape_requests(attrs, report=False):
             example 2:
             result[0][0].attrib['href'] - first result for the first xpath, get attribute 'href'
     """
-    response = f_requests.get(attrs['url'], headers=attrs['headers'])
+    if 'cookies' in attrs:
+        cookies = attrs['cookies']
+    else:
+        cookies = ''
+    response = f_requests.get(attrs['url'], headers=attrs['headers'], cookies=cookies)
     if response.status_code == 404:
         print('404 error - {}'.format(attrs['url']))
         return 404
