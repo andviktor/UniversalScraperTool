@@ -19,7 +19,7 @@ def get(url, headers):
 
     """
     try:
-        response = requests.get(url, headers)
+        response = requests.get(url, headers=headers)
         print('{}: {}'.format(response.status_code, url))
         return response
     except:
