@@ -1,3 +1,5 @@
+from classes.common.Timer import Timer
+
 import functions.formats.f_csv as f_csv
 import functions.formats.f_txt as f_txt
 
@@ -6,12 +8,10 @@ import functions.modules.m_headers as m_headers
 
 import functions.scrapers.s_requests as s_requests
 
-import time
-
 def main():
 
     ### Start time
-    start_time = time.time()
+    total_timer = Timer('Total time')
     errors = 0
     pagenotfound = 0
 
@@ -108,7 +108,7 @@ def main():
     links_done = f_txt.read_file_txt(output_links)
     m_thread.create_pool(scrape_link, links, concurrency)
 
-    print('Completed, total time is: '+str(time.time() - start_time))
+    total_timer.check_time()
     print('Errors: '+str(errors))
     print('404: '+str(pagenotfound))
 
