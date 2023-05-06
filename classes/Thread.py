@@ -1,6 +1,6 @@
 from multiprocessing.pool import ThreadPool
 
-def create_pool(func, data, concurrency=1):
+class Thread:
     """Creates a thread pool
 
         Params:
@@ -13,7 +13,8 @@ def create_pool(func, data, concurrency=1):
             ]
         concurrency (int) - the number of concurrencies, default 1
     """
-    pool = ThreadPool(concurrency) 
-    pool.map(func, data)
-    pool.close() 
-    pool.join()
+    def __init__(self, func, data, concurrency=1):
+        pool = ThreadPool(concurrency) 
+        pool.map(func, data)
+        pool.close() 
+        pool.join()

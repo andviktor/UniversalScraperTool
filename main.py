@@ -1,8 +1,7 @@
 from classes.Timer import Timer
 from classes.ImportExport import ImportExportTxt, ImportExportCsv
 from classes.Headers import Headers
-
-import functions.modules.m_thread as m_thread
+from classes.Thread import Thread
 
 import functions.scrapers.s_requests as s_requests
 
@@ -56,7 +55,7 @@ def main():
         }
         links = s_requests.scrape_requests(attrs)['links']
         io_input_tasks.write(links, mode='a')
-    m_thread.create_pool(scrape_category, categories, concurrency)
+    thread_all_links = Thread(scrape_category, categories, concurrency)
 
     ### Scraping (Pool task): get every link page data
     def scrape_link(link):
@@ -112,7 +111,7 @@ def main():
         'images'
     ]
     links_done = io_output_links.read()
-    m_thread.create_pool(scrape_link, links, concurrency)
+    thread_page_data = Thread(scrape_link, links, concurrency)
 
     total_timer.check_time()
     print('Errors: '+str(errors))
