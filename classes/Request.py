@@ -1,7 +1,7 @@
 import requests
 import re
 
-class Requests:
+class Request:
     """Requests operations with URL
     """
     def __init__(self, url):

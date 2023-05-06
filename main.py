@@ -2,10 +2,12 @@ from classes.Timer import Timer
 from classes.ImportExport import ImportExportTxt, ImportExportCsv
 from classes.Headers import Headers
 from classes.Thread import Thread
-
-import functions.scrapers.s_requests as s_requests
+from classes.Scraper import ScraperRequests
 
 def main():
+
+    ### Init scraper
+    scraper_requests = ScraperRequests()
 
     ### Start time
     total_timer = Timer('Total time')
@@ -39,7 +41,7 @@ def main():
             }
         ]
     }
-    categories = s_requests.scrape_requests(attrs)['links']
+    categories = scraper_requests.scrape(attrs)['links']
     
     ### Scraping: get all links
     def scrape_category(link):
@@ -53,9 +55,9 @@ def main():
                 }
             ]
         }
-        links = s_requests.scrape_requests(attrs)['links']
+        links = scraper_requests.scrape(attrs)['links']
         io_input_tasks.write(links, mode='a')
-    thread_all_links = Thread(scrape_category, categories, concurrency)
+    thread = Thread(scrape_category, categories, concurrency)
 
     ### Scraping (Pool task): get every link page data
     def scrape_link(link):
@@ -63,7 +65,7 @@ def main():
         if not link in links_done:
             try:
                 attrs['url'] = link
-                elements = s_requests.scrape_requests(attrs, report=False)
+                elements = scraper_requests.scrape(attrs, report=False)
                 if elements != 404:
                     io_output.write(csv_header, elements)
                     io_output_links.write(link, mode='a')
@@ -111,7 +113,7 @@ def main():
         'images'
     ]
     links_done = io_output_links.read()
-    thread_page_data = Thread(scrape_link, links, concurrency)
+    thread = Thread(scrape_link, links, concurrency)
 
     total_timer.check_time()
     print('Errors: '+str(errors))
