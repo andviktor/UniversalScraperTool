@@ -1,7 +1,5 @@
-from classes.common.Timer import Timer
-
-import functions.formats.f_csv as f_csv
-import functions.formats.f_txt as f_txt
+from classes.Timer import Timer
+from classes.ImportExport import ImportExportTxt, ImportExportCsv
 
 import functions.modules.m_thread as m_thread
 import functions.modules.m_headers as m_headers
@@ -22,6 +20,11 @@ def main():
     input_tasks = './input/tasks.txt'
     output_links = './output/links.txt'
     output = './output/output.csv'
+
+    ### Input/output objects
+    io_input_tasks = ImportExportTxt(input_tasks)
+    io_output_links = ImportExportTxt(output_links)
+    io_output = ImportExportCsv(output)
 
     ### Scraping: get categories links
     attrs = {
@@ -49,7 +52,7 @@ def main():
             ]
         }
         links = s_requests.scrape_requests(attrs)['links']
-        f_txt.write_txt(input_tasks, links, mode='a')
+        io_input_tasks.write(links, mode='a')
     m_thread.create_pool(scrape_category, categories, concurrency)
 
     ### Scraping (Pool task): get every link page data
@@ -60,15 +63,15 @@ def main():
                 attrs['url'] = link
                 elements = s_requests.scrape_requests(attrs, report=False)
                 if elements != 404:
-                    f_csv.write_dict_row_csv(output, csv_header, elements)
-                    f_txt.write_txt(output_links, link, mode='a')
+                    io_output.write(csv_header, elements)
+                    io_output_links.write(link, mode='a')
                 else:
                     pagenotfound += 1
             except:
                 print('Error: ' + link)
                 errors += 1
     
-    links = f_txt.read_file_txt(input_tasks)
+    links = io_input_tasks.read()
     attrs = {
         'headers': m_headers.get_random_header(),
         'elements': [
@@ -105,7 +108,7 @@ def main():
         'description',
         'images'
     ]
-    links_done = f_txt.read_file_txt(output_links)
+    links_done = io_output_links.read()
     m_thread.create_pool(scrape_link, links, concurrency)
 
     total_timer.check_time()
