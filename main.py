@@ -57,7 +57,7 @@ def main():
         }
         links = scraper_requests.scrape(attrs)['links']
         io_input_tasks.write(links, mode='a')
-    thread = Thread(scrape_category, categories, concurrency)
+    Thread(scrape_category, categories, concurrency)
 
     ### Scraping (Pool task): get every link page data
     def scrape_link(link):
@@ -113,7 +113,7 @@ def main():
         'images'
     ]
     links_done = io_output_links.read()
-    thread = Thread(scrape_link, links, concurrency)
+    Thread(scrape_link, links, concurrency)
 
     total_timer.check_time()
     print('Errors: '+str(errors))
