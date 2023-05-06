@@ -1,6 +1,6 @@
 from classes.Soup import Soup
+from classes.Requests import Requests
 
-import functions.modules.m_requests as f_requests
 import re
 
 def scrape_requests(attrs, report=False):
@@ -47,7 +47,8 @@ def scrape_requests(attrs, report=False):
         cookies = attrs['cookies']
     else:
         cookies = ''
-    response = f_requests.get(attrs['url'], headers=attrs['headers'], cookies=cookies)
+    request_object = Requests(attrs['url'])
+    response = request_object.get(headers=attrs['headers'], cookies=cookies)
     if response.status_code == 404:
         print('404 error - {}'.format(attrs['url']))
         return 404
