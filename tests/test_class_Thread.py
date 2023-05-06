@@ -18,10 +18,10 @@ def test_thread():
         json_file.write(input_dict, mode='w')
         
 
-    data = range(1000)
+    data = range(10)
 
-    time_1 = timeit.timeit('Thread(func, data, 1)', number=5, setup="from classes.Thread import Thread", globals={'func': func, 'data': data})
-    time_2 = timeit.timeit('Thread(func, data, 20)', number=5, setup="from classes.Thread import Thread", globals={'func': func, 'data': data})
+    time_1 = timeit.timeit('thread = Thread(func, data, 1); thread.set_delay(0.1); thread.run()', number=1, setup="from classes.Thread import Thread", globals={'func': func, 'data': data})
+    time_2 = timeit.timeit('thread = Thread(func, data, 20); thread.set_delay(0.1); thread.run()', number=1, setup="from classes.Thread import Thread", globals={'func': func, 'data': data})    
 
     os.remove(filename)
 
