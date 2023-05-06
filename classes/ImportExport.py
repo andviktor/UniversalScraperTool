@@ -122,7 +122,7 @@ class ImportExportJson:
         Params:
         filename (str) - path to a JSON file
     """
-    def __init__(self, filename):
+    def __init__(self, filename=None):
         self._filename = filename
 
     def set_filename(self, filename):

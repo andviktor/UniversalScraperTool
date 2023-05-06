@@ -8,7 +8,11 @@ class Headers:
         filename (str) - path to a json file with headers
     """
     def __init__(self, filename):
-        self._filename = filename
+        try:
+            open(filename, 'r')
+            self._filename = filename
+        except Exception:
+            raise
 
     def set_filename(self, filename):
         """Set filename
