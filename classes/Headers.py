@@ -3,19 +3,25 @@ import random
 
 class Headers:
     """Headers for requests
+
+        Params:
+        filename (str) - path to a json file with headers
     """
-    def __init__(self, filename='./headers/headers.json'):
-        self.filename = filename
+    def __init__(self, filename):
+        self._filename = filename
 
-    def get_random(self, filename=None):
-        """Returns a random headers dictionary
-
-            Params:
-            filename (str, optional) - path to a json file with headers list, default self.filename
-
+    def set_filename(self, filename):
+        """Set filename
         """
-        if filename is None:
-            filename = self.filename
-        json_file = ImportExportJson(filename)
+        try:
+            open(filename, 'r')
+            self._filename = filename
+        except Exception:
+            raise
+
+    def get_random(self):
+        """Returns a random headers dictionary
+        """
+        json_file = ImportExportJson(self._filename)
         headers_list = json_file.read()
         return random.choice(headers_list)

@@ -3,21 +3,23 @@ import re
 class String:
     """String operations
     """
-    def __init__(self, string=None):
-        if not string is None:
-            self.string = string
-        else:
-            self.string = None
+    def __init__(self, string):
+        self._string = string
 
-    def get_url_parts(self, url=None, params_list=False):
+    def set_string(self, string):
+        """Set string
+        """
+        self._string = string
+
+    def get_url_parts(self, params_list=False):
         """Get parts of url
 
             Params:
-            url (str) - any URL (example: https://testsite.com/folder/subfolder/Test-Name.pdf?testparam1=123123&testparam2=sjdkfjsd)
             params_list (bool) - if TRUE returns URL params in the list format
 
             Example:
-            print(f_str.get_url_parts('https://testsite.com/folder/subfolder/Tes.tF_фil.e-Name.pdf?testparam1=123123&testparam2=sjdkfjsd', params_list=True))
+            string = String('https://testsite.com/folder/subfolder/Tes.tF_фil.e-Name.pdf?testparam1=123123&testparam2=sjdkfjsd')
+            print(string.get_url_parts(params_list=True))
 
             Result:
             {
@@ -35,11 +37,9 @@ class String:
                 ]
             }
         """
-        if url is None:
-            url = self.string
         try:
             output = {}
-            filename = re.search(r'(.*/)([^?]*)(.*)', url)
+            filename = re.search(r'(.*/)([^?]*)(.*)', self._string)
             if filename.group(1) != '': output['dir'] = filename.group(1)
             if filename.group(2) != '': output['filename'] = filename.group(2)
             if not params_list:
