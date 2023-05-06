@@ -9,5 +9,5 @@ def get_random_header(filename='./headers/headers.json'):
 
     """
     json_file = ImportExportJson(filename)
-    headers_list = ImportExportJson.read()
+    headers_list = json_file.read()
     return random.choice(headers_list)

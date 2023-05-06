@@ -1,5 +1,6 @@
+from classes.Soup import Soup
+
 import functions.modules.m_requests as f_requests
-import functions.modules.m_bs4 as f_bs
 import re
 
 def scrape_requests(attrs, report=False):
@@ -50,10 +51,10 @@ def scrape_requests(attrs, report=False):
     if response.status_code == 404:
         print('404 error - {}'.format(attrs['url']))
         return 404
-    soup = f_bs.set_soup(response)
+    soup = Soup(response)
     output = {}
     for xpath in attrs['elements']:
-        result = f_bs.get_elements(soup, xpath['xpath'])
+        result = soup.get_elements(xpath['xpath'])
         if 'regex_sub' in xpath.keys():
             for i, res in enumerate(result):
                 result[i] = re.sub(xpath['regex_sub'][0], xpath['regex_sub'][1], res)
