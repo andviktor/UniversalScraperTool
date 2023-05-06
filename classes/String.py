@@ -6,6 +6,8 @@ class String:
     def __init__(self, string=None):
         if not string is None:
             self.string = string
+        else:
+            self.string = None
 
     def get_url_parts(self, url=None, params_list=False):
         """Get parts of url

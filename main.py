@@ -1,8 +1,8 @@
 from classes.Timer import Timer
 from classes.ImportExport import ImportExportTxt, ImportExportCsv
+from classes.Headers import Headers
 
 import functions.modules.m_thread as m_thread
-import functions.modules.m_headers as m_headers
 
 import functions.scrapers.s_requests as s_requests
 
@@ -26,10 +26,13 @@ def main():
     io_output_links = ImportExportTxt(output_links)
     io_output = ImportExportCsv(output)
 
+    ### Headers
+    headers = Headers('./headers/headers.json')
+
     ### Scraping: get categories links
     attrs = {
         'url': 'http://ns-maf.ru/',
-        'headers': m_headers.get_random_header(),
+        'headers': headers.get_random(),
         'elements': [
             {
                 'name': 'links',
@@ -43,7 +46,7 @@ def main():
     def scrape_category(link):
         attrs = {
             'url': link,
-            'headers': m_headers.get_random_header(),
+            'headers': headers.get_random(),
             'elements': [
                 {
                     'name': 'links',
@@ -73,7 +76,7 @@ def main():
     
     links = io_input_tasks.read()
     attrs = {
-        'headers': m_headers.get_random_header(),
+        'headers': headers.get_random(),
         'elements': [
             {
                 'name': 'title',

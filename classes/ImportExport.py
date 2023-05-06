@@ -5,8 +5,7 @@ class ImportExportTxt:
     """Reads and writes *.txt files
     """
     def __init__(self, filename=None):
-        if not filename is None:
-            self.filename = filename
+        self.filename = filename
 
     def read(self, filename=None):
         """Returns a content of a TXT file
@@ -42,8 +41,7 @@ class ImportExportCsv:
     """Reads and writes *.csv files
     """
     def __init__(self, filename=None):
-        if not filename is None:
-            self.filename = filename
+        self.filename = filename
 
     def read(self, filename=None):
         """Read a CSV file to a dictionary
@@ -109,8 +107,7 @@ class ImportExportJson:
     """Reads and writes *.json files
     """
     def __init__(self, filename=None):
-        if not filename is None:
-            self.filename = filename
+        self.filename = filename
 
     def print(self, json_object):
         """Print JSON pretty
