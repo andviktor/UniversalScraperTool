@@ -32,7 +32,7 @@ def main():
 
     ### Scraping: get categories links
     attrs = {
-        'url': 'http://ns-maf.ru/',
+        'url': 'http://mywebsite.com/',
         'headers': headers.get_random(),
         'elements': [
             {
